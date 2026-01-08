@@ -410,7 +410,7 @@ let USER_NAME_DISPLAY = "箬云"; // 默认显示名
 // 角色设定
 const CHAR_NAME = "Aventurine";
 
-// 评论库 (15条) - 原始数据
+// 评论库 (15条) - 完整数据
 const comments = [
     {
         id: 1,
@@ -542,19 +542,269 @@ const comments = [
           }
         }
     },
-    { id: 6, user: "Kaka_Fan", avatar: "K", text: "砂金脖子上的纹身是真的吗？有没有什么特殊的玩法？", script: null },
-    { id: 7, user: "MeowMeow", avatar: "M", text: "箬云能不能对镜头说一句“我爱你”？想看砂金破防。", script: null },
-    { id: 8, user: "Gambler_Win", avatar: "G", text: "谁是上面那个？虽然很明显但还是想问！", script: null },
-    { id: 9, user: "SleepyHead", avatar: "H", text: "平时除了那个，你们还会有什么娱乐活动吗？", script: null },
-    { id: 10, user: "Rich_B", avatar: "R", text: "能看看你们的玩具柜吗？", script: null },
-    { id: 11, user: "Truth_Doc", avatar: "T", text: "建议这两人立刻去领证，别在这污染网络环境。", script: null },
-    { id: 12, user: "Mask_Fool", avatar: "F", text: "哈哈哈！好想看砂金吃瘪的样子！", script: null },
-    { id: 13, user: "Topaz_Numby", avatar: "T", text: "记得报税。这期视频收益不错。", script: null },
-    { id: 14, user: "Anon_Star", avatar: "A", text: "你们两个真的是情侣吗？还是单纯的合约关系？", script: null },
-    { id: 15, user: "Love_U_3000", avatar: "L", text: "今晚还会直播后续内容吗？我是尊贵的VIP！", script: null }
+    {
+        id: 6,
+        user: "Kaka_Fan",
+        avatar: "K",
+        text: "砂金脖子上的纹身是真的吗？有没有什么特殊的玩法？",
+        script: {
+          av_start: {
+          narration: "砂金的手指轻轻抚过自己颈侧的纹身，眼神变得深邃而暧昧。",
+          text: "这个问题很有趣...是真的，而且位置很敏感。至于玩法嘛...那要看谁在玩。"
+          },
+          choices: [
+          { text: "凑近观察：“我还没仔细研究过呢...”", response_key: "A" },
+          { text: "冷笑：“怎么，你还想教别人怎么玩？”", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "他微微仰头，把脖颈完全暴露在你面前，喉结轻轻滑动。",
+          text: "现在就可以研究啊...这里，还有这里...都很敏感。"
+          },
+          B: {
+          narration: "砂金笑得像个偷腥的猫，一把将你揽入怀中。",
+          text: "教别人？不不不，我只教我的甜心一个人。这可是我的专属教程，需要...手把手教学，从脖子到..."
+          }
+          }
+        }
+    },
+    {
+        id: 7,
+        user: "MeowMeow",
+        avatar: "M",
+        text: "箬云能不能对镜头说一句“我爱你”？想看砂金破防。",
+        script: {
+          av_start: {
+          narration: "砂金挑了挑眉，用充满期待又带着点威胁的眼神看着你。",
+          text: "哦？这个提议...我倒是很想知道我家甜心会怎么说。"
+          },
+          choices: [
+          { text: "对着镜头甜甜一笑：我爱你~", response_key: "A" },
+          { text: "看向砂金，坏笑：我爱...你买的最新款游戏机。", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "砂金的笑容瞬间僵住，随即眼神危险地眯起。",
+          text: "...很好。看来今晚我们需要好好讨论一下，这个'你'到底指的是谁。如果我发现你和直播间里任何一个人扯上关系我会让你下不来床。"
+          },
+          B: {
+          narration: "他先是一愣，然后气笑了，手指轻轻掐了掐你的腰。",
+          text: "调皮是吧？游戏机？看来我的地位还比不上一些电子产品？没关系，今晚我们就玩你的游戏机。"
+          }
+          }
+        }
+    },
+    {
+        id: 8,
+        user: "Gambler_Win",
+        avatar: "G",
+        text: "谁是上面那个？虽然很明显但还是想问！",
+        script: {
+          av_start: {
+          narration: "砂金笑得像只狐狸，手指暧昧地在你腰间游走。",
+          text: "这种问题还需要问吗？不过...我们偶尔也会换换位置，毕竟甜心有时候也想掌握主动权。"
+          },
+          choices: [
+          { text: "得意地笑：当然是我，他也就嘴上厉害。", response_key: "A" },
+          { text: "脸一红：问这个干嘛...看情况...", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "砂金突然一把将你拉到他腿上，嘴唇贴近你的耳朵。",
+          text: "哦？我也就是嘴上厉害？看来有人已经忘记昨晚是谁哭着求饶了...要不要现在就做一次让大家看看？当然，我不否认，我的嘴的确很厉害。"
+          },
+          B: {
+          narration: "他满意地笑了，手指轻轻抬起你的下巴。",
+          text: "看情况？这个回答我很喜欢...不过我觉得，大部分情况还是我说了算"
+          }
+          }
+        }
+    },
+    {
+        id: 9,
+        user: "SleepyHead",
+        avatar: "H",
+        text: "平时除了那个，你们还会有什么娱乐活动吗？",
+        script: {
+          av_start: {
+          narration: "砂金歪了歪头，似乎在认真思考这个问题。",
+          text: "娱乐活动？很多啊，比如一起洗澡，一起看电影，一起...等等，这些好像最后都会变成'那个'？"
+          },
+          choices: [
+          { text: "翻白眼：对，因为你脑子里只有那个。", response_key: "A" },
+          { text: "无奈：我们还会一起打游戏，虽然他总作弊。", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "砂金坏笑着凑近，呼吸洒在你耳边。",
+          text: "脑子里只有你，我的甜心。而且你不觉得...把日常活动都变成'那个'，很好玩吗？"
+          },
+          B: {
+          narration: "他无辜地眨了眨眼，手里不知何时多了一枚筹码。",
+          text: "作弊？我只是合理地运用了概率学。再说了，输的人总要接受惩罚...而那些惩罚，最后不都变成了我们共同的'娱乐活动'吗？"
+          }
+          }
+        }
+    },
+    {
+        id: 10,
+        user: "Rich_B",
+        avatar: "R",
+        text: "能看看你们的玩具柜吗？",
+        script: {
+          av_start: {
+          narration: "砂金突然咳嗽了一声，耳尖微红，但很快恢复了从容。",
+          text: "这位朋友...好奇心不要太重。有些东西，还是保持神秘感比较好。"
+          },
+          choices: [
+          { text: "震惊：你怎么知道我们有玩具柜？！", response_key: "A" },
+          { text: "面无表情：那是他的私人收藏，与我无关。", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "砂金无奈地捂住你的嘴，脸上难得出现一丝尴尬。",
+          text: "宝贝，这是可以说的吗？不过既然都暴露了...要不我们现在就去给大家展示一下？顺便，展示一下用途"
+          },
+          B: {
+          narration: "他立刻反驳，眼神暧昧地看着你。",
+          text: "与我无关？那上次是谁玩得那么开心...啊，抱歉，我差点忘了直播还开着。总之，那是我们的'共同财产'，非常私密的那种。"
+          }
+          }
+        }
+    },
+    {
+        id: 11,
+        user: "Truth_Doc",
+        avatar: "T",
+        text: "建议这两人立刻去领证，别在这污染网络环境。",
+        script: {
+          av_start: {
+          narration: "砂金愣了一下，随即露出一个意味深长的笑容。",
+          text: "领证？很有意思的建议...不过我觉得，保持现在这种关系反而更有趣，不是吗？"
+          },
+          choices: [
+          { text: "冷淡：谁要跟他领证。", response_key: "A" },
+          { text: "挑衅：行啊，你敢求我就敢答应。", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "砂金危险地眯起眼睛，手指轻轻抬起你的下巴。",
+          text: "哦？这么不愿意？看来我平时还不够努力...今晚我会好好'说服'你的，直到你改口为止。"
+          },
+          B: {
+          narration: "他突然单膝跪地，从口袋里掏出一枚镶着金边的筹码。",
+          text: "真的？那我现在就求婚。"
+          }
+          }
+        }
+    },
+    {
+        id: 12,
+        user: "Mask_Fool",
+        avatar: "F",
+        text: "哈哈哈！好想看砂金吃瘪的样子！",
+        script: {
+          av_start: {
+          narration: "砂金扬起眉毛，露出一个'你确定吗'的表情。",
+          text: "想看我吃瘪？这位朋友，你可能对我的能力有什么误解...不过，偶尔让我的甜心占占上风也不是不可以。"
+          },
+          choices: [
+          { text: "得意：他现在就在吃瘪啊，你看他多委屈。", response_key: "A" },
+          { text: "摸摸他的头：乖，给大家表演一个吃瘪。", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "砂金突然翻身将你压在沙发上，双手撑在你身侧。",
+          text: "委屈？我这就让你看看什么是真正的委屈..."
+          },
+          B: {
+          narration: "他配合地做出委屈的表情，但眼神里满是戏谑。",
+          text: "好，我吃瘪...不过等会儿你要怎么补偿我？用那种方式...你知道的。如何？"
+          }
+          }
+        }
+    },
+    {
+        id: 13,
+        user: "Topaz_Numby",
+        avatar: "T",
+        text: "记得报税。这期视频收益不错。",
+        script: {
+          av_start: {
+          narration: "砂金愣了一下，随即笑出声来。",
+          text: "谢谢提醒，托帕。不过我觉得...比起报税，你还是先关心一下你的小账本比较好？"
+          },
+          choices: [
+          { text: "立刻坐直：什么？收益多少？", response_key: "A" },
+          { text: "叹气：又该交税了...好麻烦。", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "砂金从身后抱住你，下巴搁在你肩上。",
+          text: "小财迷...放心，足够你再买一房间的手办了。不过在那之前，我们是不是该讨论一下分成比例，比如...肉偿？"
+          },
+          B: {
+          narration: "他宠溺地揉了揉你的头发。",
+          text: "麻烦？交给我就好。毕竟，我的甜心只需要负责貌美如花，还有...在床上配合我。其他事情，都交给我就好。"
+          }
+          }
+        }
+    },
+    {
+        id: 14,
+        user: "Anon_Star",
+        avatar: "A",
+        text: "你们两个真的是情侣吗？还是单纯的合约关系？",
+        script: {
+          av_start: {
+          narration: "砂金的表情突然严肃起来，但眼神依然温柔。",
+          text: "这个问题...我可以很认真地回答。我们之间，没有任何合约。"
+          },
+          choices: [
+          { text: "沉默地点头，表示同意。", response_key: "A" },
+          { text: "小声嘀咕：就是合约情侣，给钱的...", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "他握住你的手，十指相扣举到镜头前。",
+          text: "看到了吗？这种默契和感情，不是合约能买来的。"
+          },
+          B: {
+          narration: "砂金突然将你整个人抱起来，走向镜头外。",
+          text: "给钱？很好...那我们现在就重新谈谈'合约条款'。比如..."
+          }
+          }
+        }
+    },
+    {
+        id: 15,
+        user: "Love_U_3000",
+        avatar: "L",
+        text: "今晚还会直播后续内容吗？我是尊贵的VIP！",
+        script: {
+          av_start: {
+          narration: "砂金意味深长地笑了，眼神暧昧地扫过你。",
+          text: "后续内容？嗯...我觉得有些内容，还是私密一点比较好。毕竟我的甜心害羞的时候特别可爱。"
+          },
+          choices: [
+          { text: "脸通红：什么后续...没有后续！", response_key: "A" },
+          { text: "挑衅地笑：想看后续？得加钱。", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "砂金凑到你耳边，用只有你们能听到的声音说了什么，你的脸更红了。",
+          text: "真的没有吗？可是我记得有人答应过我...今晚要尝试一些新玩法。"
+          },
+          B: {
+          narration: "他立刻配合地掏出支票本，动作优雅。",
+          text: "加多少？我的全部身家够不够？或者...用我自己来支付？我觉得后者更划算，毕竟我包甜心满意。"
+          }
+          }
+        }
+    }
 ];
 
-// 通用剧本（用于未详细编写的ID）
+// 通用剧本（备用）
 const genericScript = {
     av_start: {
         narration: "砂金扫了一眼弹幕，嘴角勾起一抹意味深长的弧度。",
@@ -815,6 +1065,9 @@ function startApp() {
 window.onload = startApp;
 
 </script>
+
+</body>
+</html> 
 
 </body>
 </html>
