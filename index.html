@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X Live - Aventurine & [Your Name]</title>
+<style>
+/* 根容器隔离与基础样式 */
+.theater-root {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #000000;
+    color: #e7e9ea;
+    height: 850px; /* 物理撑高 */
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid #2f3336;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* 启动弹窗 */
+.start-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    color: #fff;
+}
+
+.modal-content {
+    background: #16181c;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #d9b665;
+    max-width: 400px;
+    width: 80%;
+    text-align: center;
+}
+
+.modal-content h2 {
+    color: #d9b665;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.modal-content p {
+    color: #aab8c2;
+    margin-bottom: 25px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.name-input {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #2f3336;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-align: center;
+    outline: none;
+    transition: border 0.3s;
+}
+
+.name-input:focus {
+    border-color: #d9b665;
+}
+
+.start-btn {
+    background: linear-gradient(135deg, #d9b665 0%, #c9a555 100%);
+    color: #000;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    width: 100%;
+}
+
+.start-btn:hover {
+    transform: scale(1.03);
+    opacity: 0.9;
+}
+
+.start-btn:active {
+    transform: scale(0.98);
+}
+
+/* 隐藏弹窗 */
+.start-modal.hidden {
+    display: none;
+}
+
+/* 顶部导航模拟 */
+.header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #2f3336;
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+}
+.back-icon { margin-right: 20px; font-size: 20px; cursor: pointer; }
+.host-info { flex: 1; }
+.host-name { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 4px; }
+.verified-icon { color: #d9b665; width: 18px; height: 18px; fill: currentColor; } /* 砂金的金标 */
+.live-tag { background: #f91880; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 8px; text-transform: uppercase; }
+.viewer-count { color: #71767b; font-size: 13px; }
+
+/* 视频主舞台 */
+.video-stage {
+    flex: 1;
+    position: relative;
+    background: #16181c;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    cursor: default;
+}
+
+/* 模拟视频画面背景（使用外部图片） */
+.video-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: 
+        linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), /* 变暗叠加层 */
+        url('https://drive.google.com/thumbnail?id=1EKS0m6lLPcJgbZr5xgvQtgMWYhw8k_80&sz=w1000') center/cover no-repeat;
+    z-index: 0;
+}
+.video-bg::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="%23ffffff" fill-opacity="0.03"><circle cx="20" cy="20" r="1"/><circle cx="60" cy="80" r="1"/><circle cx="90" cy="10" r="1"/></g></svg>');
+    animation: grain 2s steps(4) infinite;
+}
+
+/* 字幕与旁白区域 */
+.subtitle-layer {
+    position: absolute;
+    bottom: 220px; /* 留出弹幕区高度 */
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 5;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    transition: all 0.3s ease;
+}
+
+.narration {
+    font-style: italic;
+    color: #aab8c2;
+    font-size: 13px;
+    margin-bottom: 8px;
+    background: rgba(0,0,0,0.4);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.5s ease;
+}
+.narration.active { opacity: 1; transform: translateY(0); }
+
+.dialogue-box {
+    background: rgba(0, 0, 0, 0.6);
+    border-left: 4px solid #d9b665; /* 砂金代表色 */
+    padding: 10px 15px;
+    border-radius: 0 8px 8px 0;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+}
+
+.speaker-name {
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    color: #d9b665;
+}
+.speaker-name.user { color: #f91880; border-color: #f91880; }
+
+.caption-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #fff;
+    white-space: pre-wrap;
+}
+
+/* 交互选项层 */
+.interaction-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+.interaction-overlay.active { opacity: 1; pointer-events: auto; }
+
+.choice-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #d9b665;
+    color: #fff;
+    padding: 15px 20px;
+    margin: 10px;
+    width: 80%;
+    text-align: center;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    backdrop-filter: blur(5px);
+}
+.choice-btn:hover { background: rgba(217, 182, 101, 0.2); transform: scale(1.02); }
+.choice-btn:active { transform: scale(0.98); }
+
+/* 底部弹幕区 */
+.danmaku-container {
+    height: 200px;
+    background: #000000;
+    border-top: 1px solid #2f3336;
+    overflow-y: auto;
+    padding: 10px 0;
+    position: relative;
+    z-index: 10;
+}
+.danmaku-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 15px;
+}
+.danmaku-item {
+    background: transparent;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: flex-start;
+    border: 1px solid #2f3336;
+}
+.danmaku-item:hover { background: rgba(29, 155, 240, 0.1); border-color: #1d9bf0; }
+.danmaku-item.disabled { opacity: 0.5; cursor: not-allowed; text-decoration: line-through; }
+.avatar {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #333;
+    margin-right: 10px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #888;
+}
+.comment-content { color: #e7e9ea; line-height: 1.4; }
+.username { font-weight: bold; color: #71767b; margin-right: 5px; font-size: 12px; }
+
+/* 底部控制栏模拟 */
+.controls {
+    height: 50px;
+    border-top: 1px solid #2f3336;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    justify-content: space-between;
+    background: #000;
+}
+.input-fake { color: #71767b; font-size: 14px; }
+.actions { display: flex; gap: 15px; color: #1d9bf0; font-size: 20px; }
+
+/* 状态指示器 */
+.status-indicator {
+    position: absolute;
+    top: 20px; right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    z-index: 5;
+}
+.now-playing {
+    background: rgba(0,0,0,0.6);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #d9b665;
+    border: 1px solid #d9b665;
+    display: none;
+}
+
+@keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-5%, -10%); }
+    20% { transform: translate(-15%, 5%); }
+    30% { transform: translate(7%, -25%); }
+    40% { transform: translate(-5%, 25%); }
+    50% { transform: translate(-15%, 10%); }
+    60% { transform: translate(15%, 0%); }
+    70% { transform: translate(0%, 15%); }
+    80% { transform: translate(3%, 35%); }
+    90% { transform: translate(-10%, 10%); }
+}
+
+/* 响应式调整 */
+@media (max-width: 480px) {
+    .subtitle-layer { bottom: 180px; }
+    .danmaku-container { height: 160px; }
+    .modal-content { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- 启动弹窗 -->
+<div class="start-modal" id="startModal">
+    <div class="modal-content">
+        <h2>欢迎来到X Live</h2>
+        <p>请输入你的名字</p>
+        <input type="text" class="name-input" id="userNameInput" placeholder="输入你的名字" maxlength="20" autofocus>
+        <button class="start-btn" id="startBtn">开始直播体验</button>
+    </div>
+</div>
+
+<div class="theater-root" id="mainContent" style="display: none;">
+    <!-- 头部 -->
+    <div class="header">
+        <div class="back-icon">✕</div>
+        <div class="host-info">
+          <div class="host-name">
+          Aventurine_Official 
+          <svg class="verified-icon" viewBox="0 0 24 24"><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .495.083.965.238 1.4-1.272.65-2.147 2.02-2.147 3.6 0 1.457.748 2.795 1.867 3.47-.5 1.535-.293 3.32.738 4.78l.04.055c.015.02.03.037.046.052.793 1.055 2.033 1.637 3.353 1.637.28 0 .565-.027.848-.08.625 1.042 1.724 1.695 2.95 1.695s2.324-.653 2.95-1.695c.282.053.567.08.85.08 1.32 0 2.56-.58 3.35-1.636l.046-.053.04-.055c1.03-1.46 1.238-3.245.738-4.78 1.12-.675 1.867-2.013 1.867-3.47zm-8.293 2.155l-4.5 4.5c-.172.17-.41.27-.665.27s-.494-.1-.665-.27l-2-2c-.367-.367-.367-.96 0-1.327s.96-.367 1.327 0l1.338 1.338 3.834-3.834c.367-.367.96-.367 1.327 0s.367.96 0 1.327z"/></svg>
+          <span class="live-tag">LIVE</span>
+          </div>
+          <div class="viewer-count">👁 2.1M watching • 💗 8.5M likes</div>
+        </div>
+    </div>
+
+    <!-- 视频舞台 -->
+    <div class="video-stage" id="videoStage">
+        <div class="video-bg"></div>
+        
+        <div class="status-indicator">
+          <div class="now-playing" id="nowPlayingTopic">TOPIC: Q&A</div>
+        </div>
+
+        <!-- 交互层 -->
+        <div class="interaction-overlay" id="choiceOverlay">
+          <div style="color: #fff; margin-bottom: 20px; font-weight: bold; font-size: 18px;">做出你的反应</div>
+          <div class="choice-btn" id="choiceA">选项 A</div>
+          <div class="choice-btn" id="choiceB">选项 B</div>
+        </div>
+
+        <!-- 字幕层 -->
+        <div class="subtitle-layer">
+          <div class="narration" id="narrationText">视频画面：砂金正懒洋洋地靠在电竞椅上，一只手搭在你的肩头。</div>
+          <div class="dialogue-box">
+          <div class="speaker-name" id="speakerName">Aventurine</div>
+          <div class="caption-text" id="captionText">欢迎回到我们的频道，朋友们。今天是一期特别节目——读读你们那些...充满想象力的评论。</div>
+          </div>
+        </div>
+    </div>
+
+    <!-- 弹幕列表 -->
+    <div class="danmaku-container">
+        <div class="danmaku-list" id="danmakuList">
+          <!-- JS 生成 -->
+        </div>
+    </div>
+
+    <!-- 底部栏 -->
+    <div class="controls">
+        <div class="input-fake">Say something...</div>
+        <div class="actions">
+          <span>🤍</span><span>↻</span><span>↑</span>
+        </div>
+    </div>
+</div>
+
+<script>
+// 全局变量 - 用户自定义名字
+let USER_NAME = "Ruoyun"; // 默认值
+let USER_NAME_DISPLAY = "箬云"; // 默认显示名
+
+// 角色设定
+const CHAR_NAME = "Aventurine";
+
+// 评论库 (15条) - 原始数据
+const comments = [
+    {
+        id: 1,
+        user: "ChipLover_77",
+        avatar: "C",
+        text: "听说箬云私下其实是个重度二次元死宅？真的假的？",
+        script: {
+          av_start: {
+          narration: "砂金挑了挑眉，侧头看向你，手指轻轻卷起你的一缕黑发。",
+          text: "哦？这也算秘密吗？你们应该看看她看到限量手办时的眼神...简直比看到我还没穿衣服时还要亮。"
+          },
+          choices: [
+          { text: "冷着脸吐槽：“别拿你自己跟手办比，你输定了。”", response_key: "A" },
+          { text: "打掉他的手：“闭嘴，那是艺术。”", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "砂金发出一声夸张的叹息，身体却更贴近了你，手臂占有欲十足地环住你的腰。",
+          text: "好伤心啊，甜心。看来我这个投资者还得再努力一点，争取哪天能在那堆塑料小人里...混个比它们稍高一点的地位？不过，这可是你说的，今晚我就让你重新评估一下...到底谁比较'好玩'。"
+          },
+          B: {
+          narration: "他顺势握住你打过来的手，放在唇边轻吻了一下手背，眼神里全是宠溺的笑意。",
+          text: "是是是，艺术。那我为你清空购物车的那一刻，是不是也算一种...行为艺术？毕竟，能博得箬云小姐一笑，这点信用点花得可太值了。朋友们，看到了吗？这就是我的家庭地位。"
+          }
+          }
+        }
+    },
+    {
+        id: 2,
+        user: "Golden_Dog",
+        avatar: "G",
+        text: "好奇你们谁管钱？砂金总监看起来很大手大脚哎。",
+        script: {
+          av_start: {
+          narration: "砂金发出一声轻笑，从口袋里掏出一枚筹码，在指尖灵活地翻转。",
+          text: "钱？这种庸俗的东西还需要'管'吗？只要甜心想要，整个星际和平公司的金库大门我都能试着去...敲一敲。"
+          },
+          choices: [
+          { text: "面无表情：“我不管钱，我只负责花。”", response_key: "A" },
+          { text: "叹气：“主要是负责拦着他不乱买奇怪的情趣用品。”", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "他满意地点点头，将那枚筹码轻轻塞进你的领口，冰凉的触感让你缩了缩脖子。",
+          text: "这就对了。你的任务就是保持这份美丽和快乐，至于赚取筹码这种脏活累活...交给我这个赌徒就好。怎么，这枚筹码不喜欢？这可是能换一颗小行星的特别版哦。"
+          },
+          B: {
+          narration: "砂金不仅没有羞愧，反而笑得更灿烂了，凑到麦克风前压低声音。",
+          text: "哎呀，这就被你曝光了？不过朋友们评评理，那些东西...最后享受到的人不也是你吗？上次那件'猫耳'风格的...我看你也并没有很抗拒嘛，甚至还..."
+          }
+          }
+        }
+    },
+    {
+        id: 3,
+        user: "Stardust_XXX",
+        avatar: "S",
+        text: "想看箬云戴项圈！！！那种带链子的！求求了！",
+        script: {
+          av_start: {
+          narration: "砂金眼神瞬间暗了暗，原本懒散的坐姿稍微端正了一些，但嘴角依旧挂着笑。",
+          text: "啧，这位朋友的口味...虽然我很欣赏，但不得不提醒你一句——有些画面，只有付费用户...哦不，只有我也能看。"
+          },
+          choices: [
+          { text: "翻白眼：“想得美，做梦去吧。”", response_key: "A" },
+          { text: "看向砂金：“你上次是不是买了一个藏在柜子里？”", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "他伸手捏了捏你的后颈，指腹在你的动脉处危险地摩挲，语气变得有些低沉喑哑。",
+          text: "听到了吗？我家小祖宗说不行。不过...私下里嘛，如果你表现得乖一点，或许我可以考虑让你自己挑一个喜欢的颜色？金色怎么样？很衬你的皮肤。"
+          },
+          B: {
+          narration: "砂金愣了一下，随即爆发出一阵大笑，整个人几乎笑倒在你身上。",
+          text: "哈哈哈哈！不愧是你，什么都瞒不过你的眼睛。既然被发现了...那今晚直播结束后，我们就来个'开箱测评'？放心，我会关掉摄像头的...大概？"
+          }
+          }
+        }
+    },
+    {
+        id: 4,
+        user: "Void_Ranger",
+        avatar: "V",
+        text: "箬云看起来总是好累的样子，是不是砂金太那啥了...懂的都懂。",
+        script: {
+          av_start: {
+          narration: "砂金凑近镜头，露出一个极其无辜的表情，但那双异色的眼睛里全是狡黠。",
+          text: "冤枉啊。我可是全宇宙最体贴的绅士。不过嘛...毕竟我是个赌徒，一旦上了赌桌（床），不赢到最后怎么肯收手？"
+          },
+          choices: [
+          { text: "打哈欠：“主要是心累。带孩子太累了。”", response_key: "A" },
+          { text: "瞪他一眼：“精力不足，勿扰。今晚分房睡。”", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "他委屈地蹭了蹭你的脸颊，像只求关注的大型猫科动物。",
+          text: "带孩子？我怎么记得昨晚有人哭着喊'daddy'的时候...可不是这种态度？好了好了，今晚让你早点睡...在我的怀里睡。这总行了吧？"
+          },
+          B: {
+          narration: "他的笑容僵在脸上，随即立刻换上一副讨好的表情，抓起你的手贴在自己脸侧。",
+          text: "别啊！分房睡？那谁来给你当抱枕？谁来给你暖床？朋友们，快帮我求求情。分房是不可能分房的，这辈子都不可能。大不了...我今晚只动口不动手？我觉得我们可以试试只用口"
+          }
+          }
+        }
+    },
+    {
+        id: 5,
+        user: "IPC_Invest_Bot",
+        avatar: "I",
+        text: "下期视频能不能出Cosplay？想看兔女郎或者修女！",
+        script: {
+          av_start: {
+          narration: "砂金摸着下巴，似乎在认真思考这个提议的可行性。",
+          text: "修女...禁欲系？嗯...在神圣的伪装下做一些亵渎的事情，确实很符合我的美学。亲爱的，你怎么看？"
+          },
+          choices: [
+          { text: "拒绝三连：“不穿，不想，不拍。”", response_key: "A" },
+          { text: "指着砂金：“除非你穿，我就考虑。”", response_key: "B" }
+          ],
+          av_response: {
+          A: {
+          narration: "他耸了耸肩，对着镜头做了一个'我也没办法'的手势。",
+          text: "看吧，我也很难办。不过...如果是为了'艺术献身'，我相信我有办法说服她。比如...那一柜子的绝版漫画？或者...某个星球的永久居住权？我们走着瞧。"
+          },
+          B: {
+          narration: "砂金挑起眉毛，眼神变得有些危险，身体前倾压迫感十足。",
+          text: "哦？想看我穿？这可是另外的价钱了...不过，如果这是你的愿望，我可以和你打个赌。如果今晚你能坚持到最后不求饶...下期视频，我就穿给你看。敢赌吗？"
+          }
+          }
+        }
+    },
+    { id: 6, user: "Kaka_Fan", avatar: "K", text: "砂金脖子上的纹身是真的吗？有没有什么特殊的玩法？", script: null },
+    { id: 7, user: "MeowMeow", avatar: "M", text: "箬云能不能对镜头说一句“我爱你”？想看砂金破防。", script: null },
+    { id: 8, user: "Gambler_Win", avatar: "G", text: "谁是上面那个？虽然很明显但还是想问！", script: null },
+    { id: 9, user: "SleepyHead", avatar: "H", text: "平时除了那个，你们还会有什么娱乐活动吗？", script: null },
+    { id: 10, user: "Rich_B", avatar: "R", text: "能看看你们的玩具柜吗？", script: null },
+    { id: 11, user: "Truth_Doc", avatar: "T", text: "建议这两人立刻去领证，别在这污染网络环境。", script: null },
+    { id: 12, user: "Mask_Fool", avatar: "F", text: "哈哈哈！好想看砂金吃瘪的样子！", script: null },
+    { id: 13, user: "Topaz_Numby", avatar: "T", text: "记得报税。这期视频收益不错。", script: null },
+    { id: 14, user: "Anon_Star", avatar: "A", text: "你们两个真的是情侣吗？还是单纯的合约关系？", script: null },
+    { id: 15, user: "Love_U_3000", avatar: "L", text: "今晚还会直播后续内容吗？我是尊贵的VIP！", script: null }
+];
+
+// 通用剧本（用于未详细编写的ID）
+const genericScript = {
+    av_start: {
+        narration: "砂金扫了一眼弹幕，嘴角勾起一抹意味深长的弧度。",
+        text: "这个问题嘛...有点越界了哦朋友。不过看在你这么好奇的份上..."
+    },
+    choices: [
+        { text: "打断他：“下一个。”", response_key: "A" },
+        { text: "配合：“无可奉告。”", response_key: "B" }
+    ],
+    av_response: {
+        A: {
+          narration: "他笑着摊开手，一副宠溺的样子。",
+          text: "听到了吗？老板发话了。看来这个秘密只能留着我们自己回味了。"
+        },
+        B: {
+          narration: "他转过头看着你，眼神拉丝。",
+          text: "真是冷淡啊...不过我就喜欢你这副拒人于千里之外的样子，特别是之后...变得热情的反差。"
+        }
+    }
+};
+
+// 状态管理
+let isPlaying = false;
+let currentScript = null;
+let typeWriterTimer = null;
+
+// 处理名字替换
+function replaceUserName(text) {
+    if (!text || typeof text !== 'string') return text;
+    
+    // 替换"箬云"为自定义名字
+    return text.replace(/箬云/g, USER_NAME_DISPLAY);
+}
+
+// 初始化弹幕列表
+function initDanmaku() {
+    const list = document.getElementById('danmakuList');
+    
+    // 先清空列表
+    list.innerHTML = '';
+    
+    // 使用处理后的评论数据
+    const processedComments = comments.map(comment => {
+        const processedComment = { ...comment };
+        
+        // 替换评论文本中的"箬云"
+        processedComment.text = replaceUserName(comment.text);
+        
+        // 处理脚本中的文本
+        if (comment.script) {
+            const processedScript = JSON.parse(JSON.stringify(comment.script));
+            
+            // 替换av_start中的文本
+            processedScript.av_start.narration = replaceUserName(processedScript.av_start.narration);
+            processedScript.av_start.text = replaceUserName(processedScript.av_start.text);
+            
+            // 替换choices中的文本
+            processedScript.choices.forEach(choice => {
+                choice.text = replaceUserName(choice.text);
+            });
+            
+            // 替换av_response中的文本
+            Object.keys(processedScript.av_response).forEach(key => {
+                processedScript.av_response[key].narration = replaceUserName(processedScript.av_response[key].narration);
+                processedScript.av_response[key].text = replaceUserName(processedScript.av_response[key].text);
+            });
+            
+            processedComment.script = processedScript;
+        }
+        
+        return processedComment;
+    });
+    
+    // 生成弹幕列表
+    processedComments.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'danmaku-item';
+        item.onclick = () => playScenario(c.id);
+        item.innerHTML = `
+          <div class="avatar">${c.avatar}</div>
+          <div>
+          <span class="username">@${c.user}</span>
+          <span class="comment-content">${c.text}</span>
+          </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+// 播放场景主逻辑
+function playScenario(id) {
+    if (isPlaying) return;
+    isPlaying = true;
+    
+    // UI状态更新
+    document.getElementById('nowPlayingTopic').style.display = 'block';
+    document.getElementById('nowPlayingTopic').innerText = "TOPIC: #" + id + " 回复中...";
+    
+    // 获取剧本
+    const commentData = comments.find(c => c.id === id);
+    currentScript = commentData.script || genericScript;
+
+    // 处理当前剧本中的名字替换
+    if (currentScript) {
+        const processedScript = JSON.parse(JSON.stringify(currentScript));
+        
+        processedScript.av_start.narration = replaceUserName(processedScript.av_start.narration);
+        processedScript.av_start.text = replaceUserName(processedScript.av_start.text);
+        
+        processedScript.choices.forEach(choice => {
+            choice.text = replaceUserName(choice.text);
+        });
+        
+        Object.keys(processedScript.av_response).forEach(key => {
+            processedScript.av_response[key].narration = replaceUserName(processedScript.av_response[key].narration);
+            processedScript.av_response[key].text = replaceUserName(processedScript.av_response[key].text);
+        });
+        
+        currentScript = processedScript;
+    }
+
+    // 禁用弹幕点击
+    document.querySelectorAll('.danmaku-item').forEach(el => el.classList.add('disabled'));
+
+    // 第一阶段：砂金回应
+    playDialogue(CHAR_NAME, currentScript.av_start.narration, currentScript.av_start.text, () => {
+        // 显示选项
+        showChoices();
+    });
+}
+
+// 播放对话（含打字机效果）
+function playDialogue(speaker, narration, text, callback) {
+    const narrationEl = document.getElementById('narrationText');
+    const speakerEl = document.getElementById('speakerName');
+    const captionEl = document.getElementById('captionText');
+    const box = document.querySelector('.dialogue-box');
+
+    // 设置样式
+    narrationEl.classList.remove('active');
+    setTimeout(() => {
+        narrationEl.innerText = narration;
+        narrationEl.classList.add('active');
+    }, 300);
+
+    speakerEl.innerText = speaker;
+    if (speaker === USER_NAME) {
+        speakerEl.classList.add('user');
+        box.style.borderLeftColor = '#f91880';
+    } else {
+        speakerEl.classList.remove('user');
+        box.style.borderLeftColor = '#d9b665';
+    }
+
+    // 打字机效果
+    captionEl.innerText = "";
+    let i = 0;
+    clearInterval(typeWriterTimer);
+    typeWriterTimer = setInterval(() => {
+        captionEl.innerText += text.charAt(i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(typeWriterTimer);
+          if (callback) setTimeout(callback, 1000); // 读完暂停1秒
+        }
+    }, 50); // 打字速度
+}
+
+// 显示选项
+function showChoices() {
+    const overlay = document.getElementById('choiceOverlay');
+    const btnA = document.getElementById('choiceA');
+    const btnB = document.getElementById('choiceB');
+
+    btnA.innerText = currentScript.choices[0].text;
+    btnB.innerText = currentScript.choices[1].text;
+
+    btnA.onclick = () => handleUserChoice('A');
+    btnB.onclick = () => handleUserChoice('B');
+
+    overlay.classList.add('active');
+}
+
+// 处理用户选择
+function handleUserChoice(key) {
+    const overlay = document.getElementById('choiceOverlay');
+    overlay.classList.remove('active');
+
+    // 获取用户台词
+    const userTextRaw = currentScript.choices[key === 'A' ? 0 : 1].text;
+    
+    // 简单的解析：冒号前是动作，冒号后是台词
+    let userAction = "你做出了回应。";
+    let userSpeech = userTextRaw;
+    if (userTextRaw.includes("：")) {
+        const parts = userTextRaw.split("：");
+        userAction = "你" + parts[0];
+        userSpeech = parts[1];
+    }
+
+    // 播放用户回应
+    playDialogue(USER_NAME, userAction, userSpeech, () => {
+        // 播放砂金最终回应
+        const finalResponse = currentScript.av_response[key];
+        playDialogue(CHAR_NAME, finalResponse.narration, finalResponse.text, () => {
+          // 结束交互
+          isPlaying = false;
+          document.querySelectorAll('.danmaku-item').forEach(el => el.classList.remove('disabled'));
+          document.getElementById('nowPlayingTopic').style.display = 'none';
+        });
+    });
+}
+
+// 处理启动
+function startApp() {
+    const nameInput = document.getElementById('userNameInput');
+    const startBtn = document.getElementById('startBtn');
+    const startModal = document.getElementById('startModal');
+    const mainContent = document.getElementById('mainContent');
+    
+    // 设置默认名称
+    nameInput.value = USER_NAME_DISPLAY;
+    
+    // 开始按钮点击事件
+    startBtn.addEventListener('click', function() {
+        const inputName = nameInput.value.trim();
+        
+        if (!inputName) {
+            alert('请输入一个名字！');
+            nameInput.focus();
+            return;
+        }
+        
+        // 更新全局变量
+        USER_NAME = inputName;
+        USER_NAME_DISPLAY = inputName;
+        
+        // 更新页面标题
+        document.title = `X Live - Aventurine & ${USER_NAME_DISPLAY}`;
+        
+        // 隐藏弹窗，显示主内容
+        startModal.classList.add('hidden');
+        mainContent.style.display = 'flex';
+        
+        // 初始化应用
+        initDanmaku();
+    });
+    
+    // 回车键触发开始
+    nameInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            startBtn.click();
+        }
+    });
+}
+
+// 启动应用
+window.onload = startApp;
+
+</script>
+
+</body>
+</html>
